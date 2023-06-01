@@ -128,4 +128,6 @@ class ChurnPredictionModel(models.Model):
         # Update the churn rate for the user in the user model or any other relevant model
         user.churn_rate = churn_rate
         user.save()
+    def get_absolute_url(self):
+        return reverse("complete_task",kwargs={"id":self.id})
 

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Task</title>
+</head>
+<body>
+    <h1>Complete Task</h1>
+    
+    <form method="POST" action="{% url 'complete_task' %}">
+        {% csrf_token %}
+        
+        <label for="logged_in_time">Logged-in Time:</label>
+        <input type="datetime-local" id="logged_in_time" name="logged_in_time" required>
+        
+        <label for="activity_completion_time">Activity Completion Time:</label>
+        <input type="datetime-local" id="activity_completion_time" name="activity_completion_time" required>
+        
+        <input type="submit" value="Complete Task">
+    </form>
+</body>
+</html>

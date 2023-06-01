@@ -3,8 +3,8 @@
 
 {% block breadcrumb %}
         <li class="breadcrumb-item">Home</li>
-        <li class="breadcrumb-item">Company</li>
-        <li class="breadcrumb-item active">New Company</li>
+        <li class="breadcrumb-item">Register/li>
+        <li class="breadcrumb-item active">ERA</li>
 {% endblock breadcrumb%}
 
 {% block content %}
@@ -15,7 +15,7 @@
     <h1>Complete Task</h1>
     
     <form method="POST" action="{% url 'complete_task' %}">
-        {% csrf_token %}
+        {% csrf_token %} >
         
         <label for="logged_in_time">Logged-in Time:</label>
         <input type="datetime-local" id="logged_in_time" name="logged_in_time" required>
@@ -24,6 +24,6 @@
         <input type="datetime-local" id="activity_completion_time" name="activity_completion_time" required>
         
         <input type="submit" value="Complete Task">
-    </form>
+        </form>
 </body>
 {% endblock %}

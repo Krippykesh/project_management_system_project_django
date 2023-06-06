@@ -10,7 +10,9 @@ from .forms import ProfilePictureForm
 from .models import ChurnPredictionModel
 
 def complete_task(request):
+    print('hey')
     if request.method == 'POST':
+        print('is post')
         # Extract the necessary data from the form
         logged_in_time = request.POST['logged_in_time']
         activity_completion_time = request.POST['activity_completion_time']
@@ -25,6 +27,7 @@ def complete_task(request):
         
         # Predict churn and record churn rate
         churn_prediction.predict_churn()
+        print('churn predicted')
         
         return redirect('task_completed')  # Redirect to a success page after completing the task
     

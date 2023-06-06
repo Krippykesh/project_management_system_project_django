@@ -4,7 +4,7 @@ from . import views
 app_name = 'register'
 
 urlpatterns = [
-    path('complete_task/', views.complete_task, name='complete_task'),
+    path('complete/', views.complete_task, name='complete_task'),
     path('new-user/', views.register, name='new-user'),
     path('new-company/', views.newCompany, name='new-company'),
     path('users/', views.usersView, name='users'),

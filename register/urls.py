@@ -4,6 +4,7 @@ from . import views
 app_name = 'register'
 
 urlpatterns = [
+    path('churn_prediction/', views.churn_prediction, name='churn_prediction'),
     path('complete/', views.complete_task, name='complete_task'),
     path('new-user/', views.register, name='new-user'),
     path('new-company/', views.newCompany, name='new-company'),

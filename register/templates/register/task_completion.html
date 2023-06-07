@@ -14,7 +14,7 @@
 <body>
     <h1>Complete Task</h1>
     
-    <form method="POST" action="{% url 'complete_task' %}">
+    <form method='post' action='complete_task'>
         {% csrf_token %} >
         
         <label for="logged_in_time">Logged-in Time:</label>

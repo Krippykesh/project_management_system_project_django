@@ -114,3 +114,7 @@ class ProfilePictureForm(forms.Form):
         super(ProfilePictureForm, self).__init__(*args, **kwargs)
         self.fields['img'].widget.attrs['class'] = 'custom-file-input'
         self.fields['img'].widget.attrs['id'] = 'validatedCustomFile'
+
+class ChurnPredictionForm(forms.Form):
+    logged_in_time = forms.DateTimeField(label='Logged-in Time', widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+    activity_completion_time = forms.DateTimeField(label='Activity Completion Time', widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))

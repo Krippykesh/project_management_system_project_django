@@ -159,6 +159,45 @@ def friends(request):
             'users_prof' : users_prof,
         }
     return render(request, 'register/friends.html', context)
-from django.shortcuts import render, redirect
+from django.shortcuts import render
+from .forms import ChurnPredictionForm
+from .models import ChurnPredictionModel
+
+def churn_prediction(request):
+    if request.method == 'POST':
+        form = ChurnPredictionForm(request.POST)
+        if form.is_valid():
+            logged_in_time = form.cleaned_data['logged_in_time']
+            activity_completion_time = form.cleaned_data['activity_completion_time']
+            
+            # Perform churn prediction based on logged-in time and activity completion time
+            # Replace this with your actual churn prediction code
+            churn_percentage = predict_churn(logged_in_time, activity_completion_time)
+            
+            # Save the churn prediction to the database
+            churn_model = ChurnPredictionModel(logged_in_time=logged_in_time, 
+                                               activity_completion_time=activity_completion_time,
+                                               churn_percentage=churn_percentage)
+            churn_model.save()
+            
+            # Render the churn prediction result template with the churn percentage
+            return render(request, 'register/churn_prediction.html', {'churn_percentage': churn_percentage})
+    else:
+        form = ChurnPredictionForm()
+    
+    return render(request, 'register/churn_prediction.html', {'form': form})
+
+def predict_churn(logged_in_time, activity_completion_time):
+    # Placeholder code for churn prediction
+    # Replace this with your actual implementation
+    
+    # Perform some calculations or data analysis
+    # to predict churn based on the given input
+    
+    # For example, you can return a random churn prediction percentage
+    churn_prediction = random.uniform(0, 100)
+    
+    return churn_prediction
+
 from .models import ChurnPredictionModel
 

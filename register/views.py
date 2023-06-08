@@ -170,7 +170,8 @@ def churn_prediction(request):
     r_index=random.randint(0, len(dhatime)-1)    
     
     random_logged_in_time = dhatime[r_index]  # Example: Random logged-in time
-    random_completion_duration = random.randint(1, 29)  # Example: Random completion duration less than 30
+    random_completion_duration = random.randint(1, 29) 
+    churn_perc=random.randint(50,100) # Example: Random completion duration less than 30
 
     return render(request, 'register/churn_prediction.html', {
         'random_logged_in_time': random_logged_in_time,

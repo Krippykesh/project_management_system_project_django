@@ -1,13 +1,11 @@
-
 {% extends 'core/base.html' %}
 {% load static %}
 
-
 {% block breadcrumb %}
-        <li class="breadcrumb-item">Home</li>
-        <li class="breadcrumb-item">Users</li>
-        <li class="breadcrumb-item active">Login</li>
-{% endblock breadcrumb%}
+    <li class="breadcrumb-item">Home</li>
+    <li class="breadcrumb-item">Users</li>
+    <li class="breadcrumb-item active">Login</li>
+{% endblock breadcrumb %}
 
 {% block content %}
 <head>
@@ -17,27 +15,37 @@
     <h1>Churn Prediction</h1>
 
     <div>
-        <label for="logged_in_time">Logged-in Time:</label>
+        <label for="logged_in_time">Activity Start Time:</label>
         <input type="datetime-local" id="logged_in_time" name="logged_in_time" required>
         
         <label for="activity_completion_time">Activity Completion Time:</label>
         <input type="datetime-local" id="activity_completion_time" name="activity_completion_time" required>
-        
     </div>
 
     <button id="predict-churn-btn">Predict Churn</button>
 
+    <div id="error-message" style="color: red;"></div>
     <div id="churn-prediction-result"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Perform churn prediction on button click
             $('#predict-churn-btn').click(function() {
-                // Generate random churn percentage
-                var churnPercentage = Math.floor(Math.random() * 100) + 1;
+                var startTime = $('#logged_in_time').val();
+                var completionTime = $('#activity_completion_time').val();
 
-                $('#churn-prediction-result').text('Churn Percentage: ' + churnPercentage + '%');
+                if (startTime === "" || completionTime === "") {
+                    $('#error-message').text("Please fill in all the fields.");
+                } else if (!$(this).prop('disabled')) {
+                    $('#error-message').text(""); // Clear the error message if all fields are filled
+
+                    var churnPercentage = Math.floor(Math.random() * 51) + 50;
+                    $('#churn-prediction-result').text('Churn Percentage: ' + churnPercentage + '%');
+
+                    $(this).prop('disabled', true); // Disable the button after it is clicked
+                } else {
+                    $('#error-message').text("Button already clicked."); // Show error message if button is clicked twice
+                }
             });
         });
     </script>

@@ -1,59 +1,45 @@
+
 {% extends 'core/base.html' %}
 {% load static %}
+
 
 {% block breadcrumb %}
         <li class="breadcrumb-item">Home</li>
         <li class="breadcrumb-item">Users</li>
-        <li class="breadcrumb-item active">Friends</li>
+        <li class="breadcrumb-item active">Login</li>
 {% endblock breadcrumb%}
+
 {% block content %}
 <head>
     <title>Churn Prediction</title>
 </head>
 <body>
     <h1>Churn Prediction</h1>
-    
-    <form id="churn-prediction-form">
-        {% csrf_token %}
-        
+
+    <div>
         <label for="logged_in_time">Logged-in Time:</label>
         <input type="datetime-local" id="logged_in_time" name="logged_in_time" required>
         
         <label for="activity_completion_time">Activity Completion Time:</label>
         <input type="datetime-local" id="activity_completion_time" name="activity_completion_time" required>
         
-        <button type="submit">Predict Churn</button>
-    </form>
-    
+    </div>
+
+    <button id="predict-churn-btn">Predict Churn</button>
+
     <div id="churn-prediction-result"></div>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Submit form using AJAX
-            $('#churn-prediction-form').submit(function(event) {
-                event.preventDefault();
-                var formData = $(this).serialize();
-                
-                $.ajax({
-                    view:  "churn_prediction" ,
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            var churnPercentage = response.churn_percentage;
-                            $('#churn-prediction-result').text('Churn Percentage: ' + churnPercentage + '%');
-                        } else {
-                            $('#churn-prediction-result').text('Error: ' + response.message);
-                        }
-                    },
-                    error: function() {
-                        $('#churn-prediction-result').text('An error occurred while processing the request.');
-                    }
-                });
+            // Perform churn prediction on button click
+            $('#predict-churn-btn').click(function() {
+                // Generate random churn percentage
+                var churnPercentage = Math.floor(Math.random() * 100) + 1;
+
+                $('#churn-prediction-result').text('Churn Percentage: ' + churnPercentage + '%');
             });
         });
     </script>
 </body>
 {% endblock %}
-

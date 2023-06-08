@@ -1,3 +1,4 @@
+import random
 from django.shortcuts import render,redirect
 from django.contrib.auth import login
 from django.shortcuts import redirect
@@ -164,28 +165,17 @@ from .forms import ChurnPredictionForm
 from .models import ChurnPredictionModel
 
 def churn_prediction(request):
-    if request.method == 'POST':
-        form = ChurnPredictionForm(request.POST)
-        if form.is_valid():
-            logged_in_time = form.cleaned_data['logged_in_time']
-            activity_completion_time = form.cleaned_data['activity_completion_time']
-            
-            # Perform churn prediction based on logged-in time and activity completion time
-            # Replace this with your actual churn prediction code
-            churn_percentage = predict_churn(logged_in_time, activity_completion_time)
-            
-            # Save the churn prediction to the database
-            churn_model = ChurnPredictionModel(logged_in_time=logged_in_time, 
-                                               activity_completion_time=activity_completion_time,
-                                               churn_percentage=churn_percentage)
-            churn_model.save()
-            
-            # Render the churn prediction result template with the churn percentage
-            return render(request, 'register/churn_prediction.html', {'churn_percentage': churn_percentage})
-    else:
-        form = ChurnPredictionForm()
     
-    return render(request, 'register/churn_prediction.html', {'form': form})
+    dhatime=["9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM","5:00 PM","5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM"]
+    r_index=random.randint(0, len(dhatime)-1)    
+    
+    random_logged_in_time = dhatime[r_index]  # Example: Random logged-in time
+    random_completion_duration = random.randint(1, 29)  # Example: Random completion duration less than 30
+
+    return render(request, 'register/churn_prediction.html', {
+        'random_logged_in_time': random_logged_in_time,
+        'random_completion_duration': random_completion_duration,
+    })
 
 def predict_churn(logged_in_time, activity_completion_time):
     # Placeholder code for churn prediction

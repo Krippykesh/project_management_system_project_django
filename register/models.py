@@ -62,7 +62,8 @@ class ChurnPredictionModel(models.Model):
     # You can adjust the fields based on your specific requirements
     logged_in_time = models.DateTimeField()
     activity_completion_time = models.DateTimeField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Assuming you have a User model
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    churn_percentage = models.DecimalField(max_digits=5, decimal_places=2)  # Assuming you have a User model
     
     @classmethod
     def train_model(cls):

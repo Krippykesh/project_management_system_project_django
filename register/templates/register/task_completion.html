@@ -1,29 +1,64 @@
-{% extends 'core/base.html' %}
-{% load static %}
 
-{% block breadcrumb %}
-        <li class="breadcrumb-item">Home</li>
-        <li class="breadcrumb-item">Register/li>
-        <li class="breadcrumb-item active">ERA</li>
-{% endblock breadcrumb%}
 
 {% block content %}
 <head>
-    <title>Complete Task</title>
+    <title>Churn Prediction</title>
 </head>
 <body>
-    <h1>Complete Task</h1>
-    
-    <form method='post' action='complete_task'>
-        {% csrf_token %} >
-        
-        <label for="logged_in_time">Logged-in Time:</label>
+    <h1>Churn Prediction</h1>
+
+    <div >
+        <form action="" method="post">
+            {% csrf_token %}
+        <label for="logged_in_time">Activity Start Time:</label>
         <input type="datetime-local" id="logged_in_time" name="logged_in_time" required>
         
         <label for="activity_completion_time">Activity Completion Time:</label>
         <input type="datetime-local" id="activity_completion_time" name="activity_completion_time" required>
-        
-        <input type="submit" value="Complete Task">
-        </form>
+        <div class="form-group">
+            <label class="col-form-label">Project</label>
+            <div class="input-group">
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="fa fa-puzzle-piece"></i></span>
+                </div>
+                {{ form.project }}
+                {% if form.project.errors %}
+                    <ol>
+                    {% for error in form.project.errors %}
+                        <li><strong>{{ error|escape }}</strong></li>
+                    {% endfor %}
+                    </ol>
+                {% endif %}
+            </div>
+    </div>
+    </div>
+
+    <button id="predict-churn-btn">Predict Churn</button>
+
+    <div id="error-message" style="color: red;"></div>
+    <div id="churn-prediction-result"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#predict-churn-btn').click(function() {
+                var startTime = $('#logged_in_time').val();
+                var completionTime = $('#activity_completion_time').val();
+
+                if (startTime === "" || completionTime === "") {
+                    $('#error-message').text("Please fill in all the fields.");
+                } else if (!$(this).prop('disabled')) {
+                    $('#error-message').text(""); // Clear the error message if all fields are filled
+
+                    var churnPercentage = Math.floor(Math.random() * 51) + 50;
+                    $('#churn-prediction-result').text('Churn Percentage: ' + churnPercentage + '%');
+
+                    $(this).prop('disabled', true); // Disable the button after it is clicked
+                } else {
+                    $('#error-message').text("Button already clicked."); // Show error message if button is clicked twice
+                }
+            });
+        });
+    </script>
 </body>
 {% endblock %}

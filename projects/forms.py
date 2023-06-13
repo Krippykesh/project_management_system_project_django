@@ -18,6 +18,9 @@ due = (
 )
 
 
+
+
+
 class TaskRegistrationForm(forms.ModelForm):
     project = forms.ModelChoiceField(queryset=Project.objects.all())
     assign = forms.ModelMultipleChoiceField(queryset=User.objects.all())

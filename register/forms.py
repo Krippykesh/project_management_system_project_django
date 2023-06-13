@@ -1,8 +1,11 @@
 from django import forms
+from .models import Project
 from register.models import Company as Comp
 from register.models import UserProfile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+
+    
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(label='E-mail', required=True)
@@ -118,3 +121,5 @@ class ProfilePictureForm(forms.Form):
 class ChurnPredictionForm(forms.Form):
     logged_in_time = forms.DateTimeField(label='Logged-in Time', widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
     activity_completion_time = forms.DateTimeField(label='Activity Completion Time', widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+    project = forms.ModelChoiceField(queryset=Project.objects.all())
+  

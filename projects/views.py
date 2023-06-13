@@ -42,6 +42,7 @@ def newTask(request):
 
 def newProject(request):
     if request.method == 'POST':
+        churn_percentage = request.session.get('churn_percentage')
         form = ProjectRegistrationForm(request.POST)
         context = {'form': form}
         if form.is_valid():
@@ -51,6 +52,8 @@ def newProject(request):
             context = {
                 'created': created,
                 'form': form,
+                'churn_percentage': churn_percentage
+
             }
             return render(request, 'projects/new_project.html', context)
         else:

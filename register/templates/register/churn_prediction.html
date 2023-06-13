@@ -15,14 +15,35 @@
     <h1>Churn Prediction</h1>
 
     <div>
-        <label for="logged_in_time">Activity Start Time:</label>
-        <input type="datetime-local" id="logged_in_time" name="logged_in_time" required>
-        
-        <label for="activity_completion_time">Activity Completion Time:</label>
-        <input type="datetime-local" id="activity_completion_time" name="activity_completion_time" required>
+        <p>Current User: {{ request.user.username }}</p>
+        <form action="http://127.0.0.1:8000/register/churn_prediction/" method="post">
+            {% csrf_token %}
+            <label for="logged_in_time">Activity Start Time:</label>
+            <input type="datetime-local" id="logged_in_time" name="logged_in_time" required>
+            
+            <label for="activity_completion_time">Activity Completion Time:</label>
+            <input type="datetime-local" id="activity_completion_time" name="activity_completion_time" required>
+            
+            <div class="form-group">
+                <label class="col-form-label">Project</label>
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fa fa-puzzle-piece"></i></span>
+                    </div>
+                    {{ form.project }}
+                    {% if form.project.errors %}
+                        <ol>
+                        {% for error in form.project.errors %}
+                            <li><strong>{{ error|escape }}</strong></li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <button id="predict-churn-btn" type="submit">Predict Churn</button>
+        </form>
     </div>
-
-    <button id="predict-churn-btn">Predict Churn</button>
 
     <div id="error-message" style="color: red;"></div>
     <div id="churn-prediction-result"></div>
@@ -30,21 +51,31 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#predict-churn-btn').click(function() {
+            $('form').submit(function(e) {
+                e.preventDefault(); // Prevent the form from submitting normally
+                
                 var startTime = $('#logged_in_time').val();
                 var completionTime = $('#activity_completion_time').val();
 
                 if (startTime === "" || completionTime === "") {
                     $('#error-message').text("Please fill in all the fields.");
-                } else if (!$(this).prop('disabled')) {
+                } else {
                     $('#error-message').text(""); // Clear the error message if all fields are filled
 
-                    var churnPercentage = Math.floor(Math.random() * 51) + 50;
-                    $('#churn-prediction-result').text('Churn Percentage: ' + churnPercentage + '%');
-
-                    $(this).prop('disabled', true); // Disable the button after it is clicked
-                } else {
-                    $('#error-message').text("Button already clicked."); // Show error message if button is clicked twice
+                    // Make an AJAX request to fetch the churn prediction data from the server
+                    $.ajax({
+                        type: 'POST',
+                        url: $(this).attr('action'), // Use the form action URL
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            // Update the churn prediction result with the returned data
+                            $('#churn-prediction-result').text('Churn Percentage: ' + response.churn_percentage + '%');
+                        },
+                        error: function(xhr, errmsg, err) {
+                            // Display error message if the AJAX request fails
+                            $('#churn-prediction-result').text("Failed to retrieve churn prediction. Please try again.");
+                        }
+                    });
                 }
             });
         });

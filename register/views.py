@@ -160,35 +160,95 @@ def friends(request):
             'users_prof' : users_prof,
         }
     return render(request, 'register/friends.html', context)
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from datetime import datetime
 from .forms import ChurnPredictionForm
 from .models import ChurnPredictionModel
 
+
+def get_churn_prediction(user_id, logged_in_time, activity_completion_time):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found.'}, status=404)
+
+    # Load the churn data
+    churn_data = pd.read_csv('register\churn_data.csv')
+
+    
+
+    # Convert datetime strings to datetime objects
+    churn_data['activity_completion_time'] = pd.to_datetime(churn_data['activity_completion_time'])
+    churn_data['logged_in_time'] = pd.to_datetime(churn_data['logged_in_time']).dt.tz_localize(None)
+    reference_time = churn_data[['activity_completion_time', 'logged_in_time']].min().min()
+    churn_data['activity_completion_hours'] = (churn_data['activity_completion_time'] - reference_time).dt.total_seconds() / 3600
+    churn_data['logged_in_hours'] = (churn_data['logged_in_time'] - reference_time).dt.total_seconds() / 3600
+
+
+
+    # Split the data into train and test sets
+    X_train, X_test, y_train, y_test = train_test_split(churn_data[['activity_completion_time', 'logged_in_time']],
+                                                        churn_data['churn'], test_size=0.25)
+
+    # Create a logistic regression model
+    model = LogisticRegression()
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Perform churn prediction for the user
+    activity_completion_time = pd.to_datetime(activity_completion_time).tz_localize(None)
+    logged_in_time = pd.to_datetime(logged_in_time).tz_localize(None)
+    user_activity_completion_hours = (activity_completion_time - reference_time).total_seconds() / 3600
+    user_logged_in_hours = (logged_in_time - reference_time).total_seconds() / 3600
+    user_data = [[user_activity_completion_hours, user_logged_in_hours]]
+
+
+    churn_prediction = model.predict(user_data)
+
+    # Convert churn prediction to percentage
+    churn_percentage = float(churn_prediction[0])
+    # Return the churn prediction as JSON response
+    return churn_percentage
+
+# Rest of the code
+
+
 def churn_prediction(request):
-    
-    dhatime=["9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM","5:00 PM","5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM"]
-    r_index=random.randint(0, len(dhatime)-1)    
-    
-    random_logged_in_time = dhatime[r_index]  # Example: Random logged-in time
-    random_completion_duration = random.randint(1, 29) 
-    churn_perc=random.randint(50,100) # Example: Random completion duration less than 30
+    if request.method == 'POST':
+        form = ChurnPredictionForm(request.POST)
+        if form.is_valid():
+            # Get form inputs
+            logged_in_time = form.cleaned_data['logged_in_time']
+            activity_completion_time = form.cleaned_data['activity_completion_time']
+            #project = form.cleaned_data['project']
+            
+            # Perform churn prediction logic
+            churn_percentage = get_churn_prediction(request.user.id, logged_in_time, activity_completion_time)
+            
+            # Store churn_percentage in session
+            request.session['churn_percentage'] = churn_percentage
 
-    return render(request, 'register/churn_prediction.html', {
-        'random_logged_in_time': random_logged_in_time,
-        'random_completion_duration': random_completion_duration,
-    })
+            # Return the churn percentage as a JSON response
+            return JsonResponse({'churn_percentage': churn_percentage})
+    else:
+        form = ChurnPredictionForm()
 
-def predict_churn(logged_in_time, activity_completion_time):
-    # Placeholder code for churn prediction
-    # Replace this with your actual implementation
+    # Generate random logged-in time and completion duration for demonstration
+    dhatime = ["9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM",
+               "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM",
+               "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM"]
+    r_index = random.randint(0, len(dhatime) - 1)
+    random_logged_in_time = dhatime[r_index]
+    random_completion_duration = random.randint(1, 29)
     
-    # Perform some calculations or data analysis
-    # to predict churn based on the given input
-    
-    # For example, you can return a random churn prediction percentage
-    churn_prediction = random.uniform(0, 100)
-    
-    return churn_prediction
+    # Generate a random churn percentage for demonstration
+    churn_percentage = random.randint(50, 100)
 
-from .models import ChurnPredictionModel
-
+    return render(request, 'register/churn_prediction.html', {'form': form})

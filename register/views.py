@@ -244,11 +244,40 @@ def churn_prediction(request):
     dhatime = ["9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM",
                "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM",
                "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM"]
-    r_index = random.randint(0, len(dhatime) - 1)
-    random_logged_in_time = dhatime[r_index]
-    random_completion_duration = random.randint(1, 29)
+    #r_index = random.randint(0, len(dhatime) - 1)
+    #random_logged_in_time = dhatime[r_index]
+    #random_completion_duration = random.randint(1, 29)
     
     # Generate a random churn percentage for demonstration
-    churn_percentage = random.randint(50, 100)
+    #churn_percentage = random.randint(50, 100)
 
     return render(request, 'register/churn_prediction.html', {'form': form})
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from register.forms import VideoUploadForm
+
+def upload_video(request):
+    if request.method == 'POST':
+        form = VideoUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Save the video file
+            video = form.save()
+            # Perform additional tasks with 'video' if needed
+            return HttpResponseRedirect('/success/')  # Redirect after successful upload
+    else:
+        form = VideoUploadForm()
+    
+    return render(request, 'register/upload.html', {'form': form})
+from django.shortcuts import render
+from .models import Video
+
+def show_result(request, video_id):
+    video = Video.objects.get(pk=video_id)
+    video_url = video.video_file.url  # Get the URL of the video file
+    download_url = video_url  # Set the download URL to the video URL (can modify if needed)
+
+    return render(request, 'video_uploader/result.html', {
+        'video_url': video_url,
+        'download_url': download_url,
+    })
+

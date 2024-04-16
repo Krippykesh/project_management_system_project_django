@@ -4,13 +4,29 @@ from register.models import Company as Comp
 from register.models import UserProfile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from .models import Video
 
+class VideoUploadForm(forms.ModelForm):
+    LANGUAGE_CHOICES = [
+        ('malayalam', 'Malayalam'),
+        ('english', 'English'),
+        ('hindi', 'Hindi'),
+        ('french', 'French'),
+        ('german', 'German'),
+        ('spanish', 'Spanish'),
+    ]
+
+    language = forms.ChoiceField(choices=LANGUAGE_CHOICES)
+    video_file = forms.FileField()
+
+    class Meta:
+        model = Video
+        fields = ['video_file', 'language']
     
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(label='E-mail', required=True)
-    company = forms.ModelChoiceField(queryset=Comp.objects.all())
-
+  
     class Meta:
         model = User
         fields = {
@@ -18,7 +34,6 @@ class RegistrationForm(UserCreationForm):
             'first_name',
             'last_name',
             'email',
-            'company',
             'password1',
             'password2',
         }
@@ -26,7 +41,7 @@ class RegistrationForm(UserCreationForm):
         labels = {
             'first_name': 'Name',
             'last_name': 'Last Name',
-            'company': 'Company',
+      
         }
 
     def save(self, commit=True):
@@ -35,11 +50,11 @@ class RegistrationForm(UserCreationForm):
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
-        company = self.cleaned_data['company']
+   
 
         if commit:
             user.save()
-            user_profile = UserProfile.objects.create(user=user, company=Comp.objects.get(name=company))
+            user_profile = UserProfile.objects.create(user=user,)
             user_profile.save()
 
         return user
@@ -58,7 +73,7 @@ class RegistrationForm(UserCreationForm):
         self.fields['password1'].widget.attrs['placeholder'] = 'Password'
         self.fields['password2'].widget.attrs['class'] = 'form-control'
         self.fields['password2'].widget.attrs['placeholder'] = 'Retype Password'
-        self.fields['company'].widget.attrs['class'] = 'form-control'
+     
 
 
 class CompanyRegistrationForm(forms.Form):

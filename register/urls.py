@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 app_name = 'register'
 
 urlpatterns = [
@@ -18,6 +19,9 @@ urlpatterns = [
     path('users/friends/', views.friends, name='friends'),
     path('users/friends/remove/<int:profile_id>/', views.remove_friend, name='remove-friend'),
     path('churn_prediction/<int:user_id>/', views.get_churn_prediction, name='get_churn_prediction'),
+     path('upload/', views.upload_video, name='upload_video'),
+     path('result/<int:video_id>/', views.show_result, name='show_result'),
+    
 ]
 
 

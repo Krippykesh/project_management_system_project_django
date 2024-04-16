@@ -7,6 +7,12 @@ from django.utils.translation import gettext_lazy as _
 from projects.models import Project
 
 
+class Video(models.Model):
+    video_file = models.FileField(upload_to='videos/')
+    language = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.video_file.name
 
 # Create your models here.
 class Company(models.Model):
@@ -26,7 +32,6 @@ class Company(models.Model):
 
 class UserProfile(models.Model):
     user    = models.ForeignKey(User, on_delete=models.CASCADE)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
     project = models.ManyToManyField(Project, blank=True)
     friends = models.ManyToManyField('self', blank=True)
     img    = models.ImageField(upload_to='core/avatar', blank=True, default='core/avatar/blank_profile.png')

@@ -51,17 +51,27 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            var isPredictionSubmitted = false;
+    
             $('form').submit(function(e) {
                 e.preventDefault(); // Prevent the form from submitting normally
-                
+    
+                // Check if prediction is already submitted
+                if (isPredictionSubmitted) {
+                    return;
+                }
+    
                 var startTime = $('#logged_in_time').val();
                 var completionTime = $('#activity_completion_time').val();
-
+    
                 if (startTime === "" || completionTime === "") {
                     $('#error-message').text("Please fill in all the fields.");
                 } else {
                     $('#error-message').text(""); // Clear the error message if all fields are filled
-
+    
+                    // Mark prediction as submitted
+                    isPredictionSubmitted = true;
+    
                     // Make an AJAX request to fetch the churn prediction data from the server
                     $.ajax({
                         type: 'POST',
@@ -74,6 +84,11 @@
                         error: function(xhr, errmsg, err) {
                             // Display error message if the AJAX request fails
                             $('#churn-prediction-result').text("Failed to retrieve churn prediction. Please try again.");
+                        },
+                        complete: function() {
+                            // Reset the form and prediction flag
+                            $('form')[0].reset();
+                            isPredictionSubmitted = false;
                         }
                     });
                 }

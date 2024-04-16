@@ -4,6 +4,7 @@ from .models import Task
 from .models import Project
 from register.models import Company
 from django.contrib.auth.models import User
+from .models import Project
 
 status = (
     ('1', 'Stuck'),
@@ -17,10 +18,6 @@ due = (
     ('3', 'Done'),
 )
 
-
-
-
-
 class TaskRegistrationForm(forms.ModelForm):
     project = forms.ModelChoiceField(queryset=Project.objects.all())
     assign = forms.ModelMultipleChoiceField(queryset=User.objects.all())
@@ -32,7 +29,6 @@ class TaskRegistrationForm(forms.ModelForm):
         model = Task
         fields = '__all__'
 
-
     def save(self, commit=True):
         task = super(TaskRegistrationForm, self).save(commit=False)
         task.project = self.cleaned_data['project']
@@ -42,13 +38,12 @@ class TaskRegistrationForm(forms.ModelForm):
         task.save()
         assigns = self.cleaned_data['assign']
         for assign in assigns:
-            task.assign.add((assign))
+            task.assign.add(assign)
 
         if commit:
             task.save()
 
         return task
-
 
     def __init__(self, *args, **kwargs):
         super(TaskRegistrationForm, self).__init__(*args, **kwargs)
@@ -66,10 +61,10 @@ class TaskRegistrationForm(forms.ModelForm):
 
 class ProjectRegistrationForm(forms.ModelForm):
     name = forms.CharField(max_length=80)
-    # slug = forms.SlugField('shortcut')
+    slug = forms.SlugField(label='shortcut', required=False)
     assign = forms.ModelMultipleChoiceField(queryset=User.objects.all())
-    efforts = forms.DurationField()
-    status = forms.ChoiceField(choices=status)
+    efforts = forms.DurationField(required=False)
+    status = forms.ChoiceField(choices=status,required=False)
     dead_line = forms.DateField()
     company = forms.ModelChoiceField(queryset=Company.objects.all())
     complete_per = forms.FloatField(min_value=0, max_value=100)
@@ -79,27 +74,25 @@ class ProjectRegistrationForm(forms.ModelForm):
         model = Project
         fields = '__all__'
 
-
     def save(self, commit=True):
-        Project = super(ProjectRegistrationForm, self).save(commit=False)
-        Project.name = self.cleaned_data['name']
-        Project.efforts = self.cleaned_data['efforts']
-        Project.status = self.cleaned_data['status']
-        Project.dead_line = self.cleaned_data['dead_line']
-        Project.company = self.cleaned_data['company']
-        Project.complete_per = self.cleaned_data['complete_per']
-        Project.description = self.cleaned_data['description']
-        Project.slug = slugify(str(self.cleaned_data['name']))
-        Project.save()
+        project = super(ProjectRegistrationForm, self).save(commit=False)
+        project.name = self.cleaned_data['name']
+        project.efforts = self.cleaned_data['efforts']
+        project.status = self.cleaned_data['status']
+        project.dead_line = self.cleaned_data['dead_line']
+        project.company = self.cleaned_data['company']
+        project.complete_per = self.cleaned_data['complete_per']
+        project.description = self.cleaned_data['description']
+        project.slug = slugify(str(self.cleaned_data['name']))
+        project.save()
         assigns = self.cleaned_data['assign']
         for assign in assigns:
-            Project.assign.add((assign))
+            project.assign.add(assign)
 
         if commit:
-            Project.save()
+            project.save()
 
-        return Project
-
+        return project
 
     def __init__(self, *args, **kwargs):
         super(ProjectRegistrationForm, self).__init__(*args, **kwargs)
@@ -118,3 +111,23 @@ class ProjectRegistrationForm(forms.ModelForm):
         self.fields['description'].widget.attrs['class'] = 'form-control'
         self.fields['description'].widget.attrs['placeholder'] = 'Type here the project description...'
         self.fields['assign'].widget.attrs['class'] = 'form-control'
+
+
+class ProjectUpdateForm(forms.ModelForm):
+    status = forms.ChoiceField(choices=status)
+
+    class Meta:
+        model = Project
+        fields = ['status']
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['status'].widget.attrs['class'] = 'form-control'
+        self.fields['status'].widget.attrs['placeholder'] = 'Status'
+
+    def save(self, commit=True):
+        project = super(ProjectUpdateForm, self).save(commit=False)
+        project.status = self.cleaned_data['status']
+        if commit:
+            project.save()
+        return project

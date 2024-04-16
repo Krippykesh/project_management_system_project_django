@@ -4,6 +4,9 @@ from register.models import Project
 from projects.models import Task
 from projects.forms import TaskRegistrationForm
 from projects.forms import ProjectRegistrationForm
+from projects.forms import ProjectUpdateForm
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 
 # Create your views here.
 def projects(request):
@@ -64,3 +67,31 @@ def newProject(request):
             'form': form,
         }
         return render(request,'projects/new_project.html', context)
+from django.shortcuts import render, get_object_or_404
+from register.models import Project
+from projects.forms import ProjectRegistrationForm
+
+def updateProject(request):
+    if request.method == 'POST':
+        project_id = request.POST.get('project_id')
+        project = get_object_or_404(Project, id=project_id)
+        form = ProjectRegistrationForm(request.POST, instance=project)
+        context = {'form': form}
+        if form.is_valid():
+            form.save()
+            updated = True
+            context = {
+                'updated': updated,
+                'form': form,
+            }
+            messages.success(request, 'Project status updated successfully.')
+
+            return render(request, 'projects/update_project.html', context)
+        else:
+            return render(request, 'projects/update_project.html', context)
+    else:
+        form = ProjectRegistrationForm()
+        context = {
+            'form': form,
+        }
+        return render(request, 'projects/update_project.html', context)
